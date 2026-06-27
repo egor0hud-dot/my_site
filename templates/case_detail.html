@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{{ case.title }} - MySite{% endblock %}
+
+{% block content %}
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('cases') }}">Кейсы</a></li>
+                        <li class="breadcrumb-item active">{{ case.title }}</li>
+                    </ol>
+                </nav>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-{{ 'chat-dots' if case.id == 'telegram_bot' else 'cart' if case.id == 'online_store' else 'gear' if case.id == 'crm_automation' else 'globe' if case.id == 'corporate_site' else 'robot' }} display-1 text-primary"></i>
+                        </div>
+                        <h1 class="card-title text-center mb-4">{{ case.title }}</h1>
+                        <div class="case-description">
+                            {{ case.description|safe }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-5">
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="bi bi-envelope"></i> Обсудить проект
+                    </a>
+                    <a href="{{ url_for('cases') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Все кейсы
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

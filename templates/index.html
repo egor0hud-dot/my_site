@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - MySite{% endblock %}
+
+{% block content %}
+<!-- Hero блок -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4 animate-fade-in">
+                    Разработка веб-приложений<br>
+                    <span class="text-primary">и автоматизация</span>
+                </h1>
+                <p class="lead mb-4 animate-fade-in-delay">
+                    Создаем современные веб-решения для вашего бизнеса. 
+                    От простых сайтов до сложных автоматизированных систем.
+                </p>
+                <div class="animate-fade-in-delay-2">
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="bi bi-envelope"></i> Связаться с нами
+                    </a>
+                    <a href="{{ url_for('cases') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-briefcase"></i> Наши кейсы
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image animate-slide-in">
+                    <i class="bi bi-laptop-code display-1 text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Описание -->
+<section class="py-5 section-muted">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-4">О нас</h2>
+                <p class="lead">
+                    Мы специализируемся на разработке веб-приложений, автоматизации бизнес-процессов 
+                    и создании современных цифровых решений. Наш опыт позволяет реализовывать проекты 
+                    любой сложности - от простых сайтов до комплексных систем с искусственным интеллектом.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Кейсы на главной -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-3">Наши кейсы</h2>
+                <p class="text-muted">Примеры реализованных проектов</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for case_id, case in cases.items() %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 case-card">
+                    <div class="card-body">
+                        <div class="case-icon mb-3">
+                            <i class="bi bi-{{ 'chat-dots' if case_id == 'telegram_bot' else 'cart' if case_id == 'online_store' else 'gear' if case_id == 'crm_automation' else 'globe' if case_id == 'corporate_site' else 'robot' }} display-4 text-primary"></i>
+                        </div>
+                        <h5 class="card-title">{{ case.title }}</h5>
+                        <p class="card-text text-muted">{{ case.short_description }}</p>
+                        <a href="{{ url_for('case_detail', case_id=case_id) }}" class="btn btn-outline-primary">
+                            Подробнее <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('cases') }}" class="btn btn-primary btn-lg">
+                Все кейсы <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Призыв к действию -->
+<section class="py-5 section-cta">
+    <div class="container text-center">
+        <h2 class="mb-4 text-white">Готовы начать проект?</h2>
+        <p class="lead mb-4 text-white-50">Свяжитесь с нами, и мы обсудим ваши задачи</p>
+        <a href="{{ url_for('contact') }}" class="btn btn-light btn-lg">
+            <i class="bi bi-envelope"></i> Отправить заявку
+        </a>
+    </div>
+</section>
+{% endblock %}
+

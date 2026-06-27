@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Контакты - MySite{% endblock %}
+
+{% block content %}
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-3">Свяжитесь с нами</h1>
+                    <p class="lead text-muted">Заполните форму, и мы свяжемся с вами в ближайшее время</p>
+                </div>
+                
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <form method="POST" action="{{ url_for('contact') }}" id="contactForm">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-3">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                                {% if form.name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.email.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.phone.label(class="form-label") }}
+                                {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""), placeholder="+7 (999) 123-45-67") }}
+                                {% if form.phone.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.phone.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.subject.label(class="form-label") }}
+                                {{ form.subject(class="form-select" + (" is-invalid" if form.subject.errors else "")) }}
+                                {% if form.subject.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.subject.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-4">
+                                {{ form.message.label(class="form-label") }}
+                                {{ form.message(class="form-control", rows="5" + (" is-invalid" if form.message.errors else "")) }}
+                                {% if form.message.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.message.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Минимум 10 символов, максимум 1000 символов</div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="bi bi-envelope display-6 text-primary"></i>
+                        <h5 class="mt-3">Email</h5>
+                        <p class="text-muted">info@mysite.com</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="bi bi-telephone display-6 text-primary"></i>
+                        <h5 class="mt-3">Телефон</h5>
+                        <p class="text-muted">+7 (999) 123-45-67</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="bi bi-clock display-6 text-primary"></i>
+                        <h5 class="mt-3">Время работы</h5>
+                        <p class="text-muted">Пн-Пт: 9:00 - 18:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Валидация уже обрабатывается в main.js
+    // Дополнительная проверка при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.querySelector('[name="phone"]');
+        if (phoneInput) {
+            // Убираем старые сообщения об ошибках при вводе
+            phoneInput.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const feedback = this.nextElementSibling;
+                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                    feedback.remove();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+

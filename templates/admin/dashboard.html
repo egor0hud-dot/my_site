@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        body {
+            background-color: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация админки -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="bi bi-shield-lock"></i> Админ-панель
+            </a>
+            <div>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-sm me-2">
+                    <i class="bi bi-house"></i> На сайт
+                </a>
+                <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Выход
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Статистика -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card" style="background: linear-gradient(135deg, #6c8eff 0%, #5a7fff 100%); color: white; border: none;">
+                    <div class="card-body">
+                        <h5 class="card-title">Всего заявок</h5>
+                        <h2 class="mb-0">{{ total_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" style="background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%); color: #000; border: none;">
+                    <div class="card-body">
+                        <h5 class="card-title">Непрочитанных</h5>
+                        <h2 class="mb-0">{{ unread_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
+                    <div class="card-body">
+                        <h5 class="card-title">Прочитанных</h5>
+                        <h2 class="mb-0">{{ total_count - unread_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Таблица заявок -->
+        <div class="card">
+            <div class="card-header" style="background-color: var(--dark-color); border-bottom: 1px solid var(--border-color);">
+                <h5 class="mb-0" style="color: var(--text-color);"><i class="bi bi-inbox"></i> Заявки из формы обратной связи</h5>
+            </div>
+            <div class="card-body">
+                {% if contacts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Имя</th>
+                                <th>Email</th>
+                                <th>Телефон</th>
+                                <th>Тема</th>
+                                <th>Сообщение</th>
+                                <th>Дата</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                            <tr class="{% if not contact.is_read %}table-warning{% endif %}">
+                                <td>{{ contact.id }}</td>
+                                <td>{{ contact.name }}</td>
+                                <td>{{ contact.email }}</td>
+                                <td>{{ contact.phone }}</td>
+                                <td>{{ contact.subject }}</td>
+                                <td>
+                                    <span class="d-inline-block text-truncate" style="max-width: 200px;" title="{{ contact.message }}">
+                                        {{ contact.message }}
+                                    </span>
+                                </td>
+                                <td>{{ contact.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                <td>
+                                    {% if contact.is_read %}
+                                        <span class="badge bg-success">Прочитано</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Новое</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not contact.is_read %}
+                                    <button class="btn btn-sm btn-outline-primary mark-read-btn" data-id="{{ contact.id }}" title="Отметить как прочитанное">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="{{ contact.id }}" title="Удалить">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <p class="text-muted mt-3">Заявок пока нет</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Получаем CSRF токен из мета-тега
+        function getCSRFToken() {
+            const token = document.querySelector('meta[name="csrf-token"]');
+            return token ? token.getAttribute('content') : '';
+        }
+        
+        // Отметить как прочитанное
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const csrfToken = getCSRFToken();
+                fetch(`/admin/contact/${id}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при обновлении заявки');
+                });
+            });
+        });
+
+        // Удаление заявки
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите удалить эту заявку?')) {
+                    const id = this.getAttribute('data-id');
+                    const csrfToken = getCSRFToken();
+                    fetch(`/admin/contact/${id}/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (response.ok || response.redirected) {
+                            location.reload();
+                        } else {
+                            throw new Error('Network response was not ok');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Произошла ошибка при удалении заявки');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

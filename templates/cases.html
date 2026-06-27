@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Кейсы - MySite{% endblock %}
+
+{% block content %}
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">Наши кейсы</h1>
+                <p class="lead text-muted">Примеры реализованных проектов и решений</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for case_id, case in cases.items() %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 case-card">
+                    <div class="card-body d-flex flex-column">
+                        <div class="case-icon mb-3">
+                            <i class="bi bi-{{ 'chat-dots' if case_id == 'telegram_bot' else 'cart' if case_id == 'online_store' else 'gear' if case_id == 'crm_automation' else 'globe' if case_id == 'corporate_site' else 'robot' }} display-4 text-primary"></i>
+                        </div>
+                        <h5 class="card-title">{{ case.title }}</h5>
+                        <p class="card-text text-muted flex-grow-1">{{ case.short_description }}</p>
+                        <a href="{{ url_for('case_detail', case_id=case_id) }}" class="btn btn-outline-primary mt-auto">
+                            Подробнее <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
